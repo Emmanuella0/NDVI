@@ -11,6 +11,11 @@ from typing import TYPE_CHECKING
 from magicgui import magic_factory
 from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget
 
+import spectral.io.envi as envi
+import numpy as np
+import matplotlib.pyplot as plt
+import tifffile as tiff
+
 if TYPE_CHECKING:
     import napari
 
@@ -34,13 +39,78 @@ class ExampleQWidget(QWidget):
         print("napari has", len(self.viewer.layers), "layers")
 
 
+def select_bands(output_file):
+    # Ouvrir le fichier
+    img = tiff.imread(output_file)
+    
+    # Nombre de bandes et dimensions de l'image
+    b, h, w = img.shape
+    
+    # Affichage de toutes les bandes
+    for i in range(b):
+        plt.imshow(img[i], cmap='gray')
+        plt.title(f"Bande {i+1}")
+        plt.axis('off')
+        plt.show()
+    
+    # Demander à l'utilisateur de selectionner une bande rouge et une bande proche infra rouge
+    while True:
+        red_band = int(input("Selectionnez une bande rouge (indice entre 1 et %d) : " % b))
+        if red_band < 1 or red_band > b:
+            print("Bande invalide. Veuillez réessayer.")
+            continue
+        else:
+            break
+            
+    while True:
+        nir_band = int(input("Selectionnez une bande proche infra rouge (indice entre 1 et %d) : " % b))
+        if nir_band < 1 or nir_band > b:
+            print("Bande invalide. Veuillez réessayer.")
+            continue
+        else:
+            break
+    
+    # Extraire les bandes sélectionnées
+    red = img[red_band-1]
+    nir = img[nir_band-1]
+    
+    # Affichage des images sélectionnées
+    fig, ax = plt.subplots(ncols=2, figsize=(10, 10))
+    ax[0].imshow(red, cmap='gray')
+    ax[0].set_title(f"Bande {red_band}")
+    ax[0].axis('off')
+    ax[1].imshow(nir, cmap='gray')
+    ax[1].set_title(f"Bande {nir_band}")
+    ax[1].axis('off')
+    plt.show()
+    
+    # Retourner les images sélectionnées avec leur numéro de bande
+    return (red, red_band), (nir, nir_band)
+
+def calculate_ndvi(red, nir):
+    # Calculer la NDVI
+    ndvi = (nir - red) / (nir + red)
+    
+    # Afficher l'image de la NDVI avec un titre
+    plt.imshow(ndvi, cmap='gray')
+    plt.title("NDVI")
+    plt.axis('off')
+    plt.show()
+    
+    # Retourner l'image de la NDVI
+    return ndvi
+
+
 @magic_factory
-def example_magic_widget(img_layer: "napari.layers.Image"):
-    print(f"you have selected {img_layer}")
+def do_ndvi(image_layer: "napari.layers.Image"):
+    widget = QWidget()
+    layout = QHBoxLayout()
+    button_select_bands = QPushButton("Select Bands")
+    button_select_bands.clicked.connect(lambda: select_bands(image_layer.data))
+    button_run_ndvi = QPushButton("Run NDVI")
+    button_run_ndvi.clicked.connect(lambda: calculate_ndvi(image_layer.data))
+    layout.addWidget(button_select_bands)
+    layout.addWidget(button_run_ndvi)
+    widget.setLayout(layout)
+    return widget
 
-
-# Uses the `autogenerate: true` flag in the plugin manifest
-# to indicate it should be wrapped as a magicgui to autogenerate
-# a widget.
-def example_function_widget(img_layer: "napari.layers.Image"):
-    print(f"you have selected {img_layer}")
