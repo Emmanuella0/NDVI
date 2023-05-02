@@ -106,11 +106,22 @@ def do_ndvi(image_layer: "napari.layers.Image"):
     widget = QWidget()
     layout = QHBoxLayout()
     button_select_bands = QPushButton("Select Bands")
-    button_select_bands.clicked.connect(lambda: select_bands(image_layer.data))
     button_run_ndvi = QPushButton("Run NDVI")
-    button_run_ndvi.clicked.connect(lambda: calculate_ndvi(image_layer.data))
+    
+    ndvi = None
+    
+    def select_bands_and_calculate_ndvi():
+        nonlocal ndvi
+        red, nir = select_bands(image_layer.data)
+        ndvi = calculate_ndvi(red, nir)
+    
+    button_select_bands.clicked.connect(select_bands_and_calculate_ndvi)
+    button_run_ndvi.clicked.connect(select_bands_and_calculate_ndvi)
+    
     layout.addWidget(button_select_bands)
     layout.addWidget(button_run_ndvi)
     widget.setLayout(layout)
-    return widget
+    
+    return ndvi
+
 
