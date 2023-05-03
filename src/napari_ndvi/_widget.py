@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from magicgui import magic_factory
 from qtpy.QtWidgets import QHBoxLayout, QPushButton, QWidget
-
+from napari.types import ImageData, LabelsData
 import spectral.io.envi as envi
 import numpy as np
 import matplotlib.pyplot as plt
@@ -101,12 +101,12 @@ def calculate_ndvi(red, nir):
     return ndvi
 
 
-@magic_factory
-def do_ndvi(image_layer: "napari.layers.Image", red_band: int = 0, nir_band: int = 0):
+@magic_factory(call_button="Run NDVI")
+def do_ndvi(image_layer: ImageData, red_band: int = 0, nir_band: int = 0) ->ImageData:
     widget = QWidget()
     layout = QHBoxLayout()
     button_select_bands = QPushButton("Select Bands")
-    button_run_ndvi = QPushButton("Run NDVI")
+    # button_run_ndvi = QPushButton("Run NDVI")
     
     ndvi = None
     
@@ -119,12 +119,12 @@ def do_ndvi(image_layer: "napari.layers.Image", red_band: int = 0, nir_band: int
             nir = image_layer.data[nir_band - 1]
         ndvi = calculate_ndvi(red, nir)
     
-    button_select_bands.clicked.connect(select_bands_and_calculate_ndvi)
-    button_run_ndvi.clicked.connect(select_bands_and_calculate_ndvi)
+    #button_select_bands.clicked.connect(select_bands_and_calculate_ndvi)
+    #button_run_ndvi.clicked.connect(select_bands_and_calculate_ndvi)
     
-    layout.addWidget(button_select_bands)
-    layout.addWidget(button_run_ndvi)
-    widget.setLayout(layout)
+    #layout.addWidget(button_select_bands)
+    #layout.addWidget(button_run_ndvi)
+    #widget.setLayout(layout)
     
     return ndvi
 
