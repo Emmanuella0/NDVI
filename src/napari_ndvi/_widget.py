@@ -92,10 +92,10 @@ def calculate_ndvi(red, nir):
     ndvi = (nir - red) / (nir + red)
     
     # Afficher l'image de la NDVI avec un titre
-    plt.imshow(ndvi, cmap='gray')
-    plt.title("NDVI")
-    plt.axis('off')
-    plt.show()
+    #plt.imshow(ndvi, cmap='gray')
+    #plt.title("NDVI")
+    #plt.axis('off')
+    #plt.show()
     
     # Retourner l'image de la NDVI
     return ndvi
@@ -111,17 +111,16 @@ def do_ndvi(image_layer: ImageData, red_band: int = 0, nir_band: int = 0) -> Ima
     
     ndvi = None
     
-    def select_bands_and_calculate_ndvi():
-        nonlocal ndvi
-        if red_band == 0 or nir_band == 0:
-            print("select correct band")
-            #*red, nir = select_bands(image_layer.data)
-        else:
-            red = image_layer[red_band - 1,:,:]
-            nir = image_layer[nir_band - 1,:,:]
-            ndvi = calculate_ndvi(red[0], nir[0])
-            print('done')
-            return ndvi
+    if red_band == 0 or nir_band == 0:
+        print("select correct band")
+        #*red, nir = select_bands(image_layer.data)
+    else:
+        red = image_layer[red_band - 1,:,:]
+        nir = image_layer[nir_band - 1,:,:]
+
+        ndvi = calculate_ndvi(red, nir)
+        print(ndvi.shape)
+        return ndvi
     #button_select_bands.clicked.connect(select_bands_and_calculate_ndvi)
     #button_run_ndvi.clicked.connect(select_bands_and_calculate_ndvi)
     
