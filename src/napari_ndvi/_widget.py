@@ -122,6 +122,10 @@ def do_ndvi(image_layer: "napari.layers.Image"):
     layout.addWidget(button_run_ndvi)
     widget.setLayout(layout)
     
+    # Ajouter le widget à la barre d'outils de Napari
+    tb = image_layer.viewer.toolbar
+    tb.addWidget(widget)
+    
     return ndvi
 
 
