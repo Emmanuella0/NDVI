@@ -102,10 +102,11 @@ def calculate_ndvi(red, nir):
 
 
 @magic_factory(call_button="Run NDVI")
-def do_ndvi(image_layer: ImageData, red_band: int = 0, nir_band: int = 0) ->ImageData:
-    widget = QWidget()
-    layout = QHBoxLayout()
-    button_select_bands = QPushButton("Select Bands")
+def do_ndvi(image_layer: ImageData, red_band: int = 0, nir_band: int = 0) -> ImageData:
+    
+    # widget = QWidget()
+    # layout = QHBoxLayout()
+    # button_select_bands = QPushButton("Select Bands")
     # button_run_ndvi = QPushButton("Run NDVI")
     
     ndvi = None
@@ -113,12 +114,14 @@ def do_ndvi(image_layer: ImageData, red_band: int = 0, nir_band: int = 0) ->Imag
     def select_bands_and_calculate_ndvi():
         nonlocal ndvi
         if red_band == 0 or nir_band == 0:
-            red, nir = select_bands(image_layer.data)
+            print("select correct band")
+            #*red, nir = select_bands(image_layer.data)
         else:
-            red = image_layer.data[red_band - 1]
-            nir = image_layer.data[nir_band - 1]
-        ndvi = calculate_ndvi(red, nir)
-    
+            red = image_layer[red_band - 1,:,:]
+            nir = image_layer[nir_band - 1,:,:]
+            ndvi = calculate_ndvi(red[0], nir[0])
+            print('done')
+            return ndvi
     #button_select_bands.clicked.connect(select_bands_and_calculate_ndvi)
     #button_run_ndvi.clicked.connect(select_bands_and_calculate_ndvi)
     
@@ -126,6 +129,6 @@ def do_ndvi(image_layer: ImageData, red_band: int = 0, nir_band: int = 0) ->Imag
     #layout.addWidget(button_run_ndvi)
     #widget.setLayout(layout)
     
-    return ndvi
+    
 
 
